@@ -10,8 +10,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -47,43 +49,53 @@ public class Roguelike {
 		gameViewArea = new Rectangle(screenWidth, screenHeight-5);
 		
 		ui = new Interface(screenWidth, screenHeight, new Rectangle(mapWidth, mapHeight));
-		
-		creatureData = loadData(Paths.get("src", "roguelike", "creatures.txt").toString());
-		tileData = loadData(Paths.get("src", "roguelike", "tiles.txt").toString());
-		itemData = loadData(Paths.get("src","roguelike",  "items.txt").toString());
+
+		creatureData = loadData(Paths.get("roguelike", "creatures.txt").toString());
+		tileData = loadData(Paths.get("roguelike", "tiles.txt").toString());
+		itemData = loadData(Paths.get("roguelike",  "items.txt").toString());
 		
 		createWorld();
 	}
 	
-	public Map<String, Map<String, String>> loadData(String file) {
-		Map<String, Map<String, String>> entityMap = new HashMap<>();
-		String line = "";
-		String[] attributeNames = new String[10];
-		
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+	public Map<String, Map<String, String>> loadData(String fileName) {
 
-        	line = br.readLine();
-        	
-        	if (line != null) {
-        		attributeNames = line.split(", ");
-        	}
-        	
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(", ");
-                Map<String, String> entityData = new HashMap<>();
-                
-                for (int i=0; i<attributeNames.length; i++) {
-                	entityData.put(attributeNames[i], data[i]);
-                }
-                
-                String name = data[1];
-                entityMap.put(name, entityData);
-            }
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return entityMap;
+		InputStream inputStream = Roguelike.class.getClassLoader().getResourceAsStream(fileName);
+		if( inputStream == null )
+		{
+			throw (new IllegalArgumentException("Not able to location file - " + fileName));
+		}
+		else
+		{
+			Reader targetReader = new InputStreamReader(inputStream);
+			Map<String, Map<String, String>> entityMap = new HashMap<>();
+			String line = "";
+			String[] attributeNames = new String[10];
+			
+			try (BufferedReader br = new BufferedReader(targetReader)) {
+
+				line = br.readLine();
+				
+				if (line != null) {
+					attributeNames = line.split(", ");
+				}
+				
+				while ((line = br.readLine()) != null) {
+					String[] data = line.split(", ");
+					Map<String, String> entityData = new HashMap<>();
+					
+					for (int i=0; i<attributeNames.length; i++) {
+						entityData.put(attributeNames[i], data[i]);
+					}
+					
+					String name = data[1];
+					entityMap.put(name, entityData);
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return entityMap;
+		}
 	}
 	
 	private void createWorld(){
