@@ -4,10 +4,10 @@ A roguelike programmed in Java. The game currently contains a few creatures and 
 
 ![Screenshot](https://jellepelgrims.com/img/workshop_gamedev_part4.png)
 
-% Build
+# Build
 
 * mvn initialize - setups local 3rd party libs
 * mvn clean package - creates jar file
 
-% Run
+# Run
 * java -jar ./target/gab-roguelike-1.0.0-SNAPSHOT-jar-with-dependencies.jar // this will be adjusted.
