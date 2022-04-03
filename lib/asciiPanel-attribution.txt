@@ -1,0 +1,5 @@
+
+Repo:  https://github.com/trystan/AsciiPanel
+Author:  Trystan Spangler [trystan]
+Copyright (c) 2015 Trystan Spangler
+License:  MIT License:  https://github.com/trystan/AsciiPanel/blob/master/LICENSE.md
