@@ -1,6 +1,8 @@
 package roguelike.world;
 
+import roguelike.Constants;
 import roguelike.entities.Creature;
+import roguelike.entities.Item;
 import roguelike.entities.Tile;
 
 import java.util.*;
@@ -11,15 +13,18 @@ public class WorldBuilder {
 	private Tile[][] tiles;
 	private Map<String, Map<String, String>> tileData;
 	private Map<String, Map<String, String>> creatureData;
-	private Set<Creature> creatures;
+	private Map<String, Map<String, String>> itemData;
 
-	public WorldBuilder(Map<String, Map<String, String>> tileData, Map<String, Map<String, String>> creatureData, int width, int height) {
+	private int nrOfCreatures = 0;
+	private int nrOfItems = 0;
+
+	public WorldBuilder(Map<String, Map<String, String>> tileData, Map<String, Map<String, String>> creatureData, Map<String, Map<String, String>> itemData,int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
 		this.tileData = tileData;
 		this.creatureData = creatureData;
-		this.creatures = new HashSet<Creature>();
+		this.itemData = itemData;
 	}
 
 	public WorldBuilder load(String file) {
@@ -27,12 +32,16 @@ public class WorldBuilder {
 		return this;
 	}
 	
-	public Tile createTile(String type, int x, int y) {
+	private Tile createTile(String type, int x, int y) {
 		return new Tile(tileData.get(type), x, y);
 	}
 	
-	public Creature createCreature(String type, int x, int y) {
-		return new Creature(creatureData.get(type), x, y);
+	private Creature createCreature(World world, String type, int x, int y) {
+		return new Creature(world, creatureData.get(type), x, y);
+	}
+
+	private Item createItem(World world, String type, int x, int y) {
+		return new Item(world, itemData.get(type), x, y);
 	}
 	
 	public WorldBuilder fill(String tileType) {
@@ -46,13 +55,13 @@ public class WorldBuilder {
 	
 	public WorldBuilder addBorders() {
 		for (int x=0; x<width; x++) {
-			tiles[x][0] = createTile("wall", x, 0);
-			tiles[x][height-1] = createTile("wall", x, height-1);
+			tiles[x][0] = createTile(Constants.WALL_TYPE, x, 0);
+			tiles[x][height-1] = createTile(Constants.WALL_TYPE, x, height-1);
 		}
 		
 		for (int y=0; y<height; y++) {
-			tiles[0][y] = createTile("wall", 0, y);
-			tiles[width-1][y] = createTile("wall", width-1, y);
+			tiles[0][y] = createTile(Constants.WALL_TYPE, 0, y);
+			tiles[width-1][y] = createTile(Constants.WALL_TYPE, width-1, y);
 		}
 		return this;
 	}
@@ -60,32 +69,19 @@ public class WorldBuilder {
 	public WorldBuilder carveOutRoom(int topX, int topY, int width, int height) {
 		for (int x=topX; x < topX+width; x++) {
 			for (int y=topY; y < topY+height; y++) {
-				tiles[x][y] = createTile("ground", x, y);
+				tiles[x][y] = createTile(Constants.GROUND_TYPE, x, y);
 			}
 		}
 		return this;
 	}
 	
 	public WorldBuilder populateWorld(int nrOfCreatures) {
-		Random rnd = new Random();
-		int rndX;
-		int rndY;
-		
-		for (int i=0; i < nrOfCreatures; i++) {
-			
-			do {
-				rndX = rnd.nextInt(width);
-				rndY = rnd.nextInt(height);
-			} while (tiles[rndX][rndY].isBlocked());
-			
-			List<String> creatureTypes = new ArrayList<String>(creatureData.keySet());
-			creatureTypes.remove("player");
-			String creatureType = creatureTypes.get(rnd.nextInt(creatureTypes.size()));
-			
-			creatures.add(createCreature(creatureType, rndX, rndY));
-			
-		}
-		
+		this.nrOfCreatures = nrOfCreatures;
+		return this;
+	}
+
+	public WorldBuilder addItems(int nrOfItems) {
+		this.nrOfItems = nrOfItems;
 		return this;
 	}
 	
@@ -107,14 +103,60 @@ public class WorldBuilder {
 				y -= 1;
 			}
 			
-			tiles[x][y] = createTile("ground", x, y);
+			tiles[x][y] = createTile(Constants.GROUND_TYPE, x, y);
 		}
 
 		return this;
 	}
 	
 	public World build() {
-		return new World(tiles, creatures);
+
+		World world = new World(tiles);
+
+		if( this.nrOfCreatures > 0 )
+		{
+			Random rnd = new Random();
+			int rndX;
+			int rndY;
+			
+			for (int i=0; i < nrOfCreatures; i++) {
+				
+				do {
+					rndX = rnd.nextInt(width);
+					rndY = rnd.nextInt(height);
+				} while (tiles[rndX][rndY].isBlocked());
+				
+				List<String> creatureTypes = new ArrayList<String>(creatureData.keySet());
+				creatureTypes.remove(Constants.PLAYER);
+				String creatureType = creatureTypes.get(rnd.nextInt(creatureTypes.size()));
+				
+				world.addEntity(createCreature(world, creatureType, rndX, rndY));
+				
+			}
+		}	
+
+		if( this.nrOfItems > 0 )
+		{
+			Random rnd = new Random();
+			int rndX;
+			int rndY;
+			
+			for (int i=0; i < nrOfItems; i++) {
+				
+				do {
+					rndX = rnd.nextInt(width);
+					rndY = rnd.nextInt(height);
+				} while (tiles[rndX][rndY].isBlocked());
+				
+				List<String> itemTypes = new ArrayList<String>(itemData.keySet());
+				String itemType = itemTypes.get(rnd.nextInt(itemTypes.size()));
+				
+				world.addEntity(createItem(world, itemType, rndX, rndY));
+				
+			}
+		}
+
+		return (world);
 	}
 
 }

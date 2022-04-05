@@ -1,7 +1,9 @@
 package roguelike.world;
 
+import roguelike.Constants;
 import roguelike.entities.Creature;
 import roguelike.entities.Entity;
+import roguelike.entities.Item;
 import roguelike.entities.Tile;
 
 import java.awt.*;
@@ -10,31 +12,57 @@ import java.util.Set;
 
 public class World {
 	
+	//TODO:  Add layers - depth
 	private Tile[][] tiles;
+
+
+
 	private int width;
 	private int height;
 	public Creature player;
 	public Set<Creature> creatures;
+	public Set<Item> items;
 	
 	public int width() { return width; }
 	public int height() { return height; }
 	
 	public World(Tile[][] tiles){
-		this.tiles = tiles;
-		this.width = tiles.length;
-		this.height = tiles[0].length;
+		this(tiles, null, null);
 	}
 	
-	public World(Tile[][] tiles, Set<Creature> creatures){
+	public World(Tile[][] tiles, Set<Creature> creatures, Set<Item> items){
 		this.creatures = new HashSet<>();
-		this.creatures.addAll(creatures);
+
+		if( creatures != null ) 
+		{
+			this.creatures.addAll(creatures);
+		}
+
+		this.items = new HashSet<>();
+		if( items != null ) 
+		{
+			this.items.addAll(items);
+		}
+
 		this.tiles = tiles;
 		this.width = tiles.length;
 		this.height = tiles[0].length;
 	}
 	
-	public void addEntity(Creature creature) {
-		this.creatures.add(creature);
+	public void addEntity(Entity entity) {
+		if (entity instanceof Item) {
+			this.items.add((Item)entity);
+		} else if (entity instanceof Creature) {
+			this.creatures.add((Creature)entity);
+		}
+	}
+
+	public void removeEntity(Entity entity) {
+		if (entity instanceof Item) {
+			this.items.remove(entity);
+		} else if (entity instanceof Creature) {
+			this.creatures.remove(entity);
+		}
 	}
 	
 	public Tile tile(int x, int y){
@@ -57,10 +85,19 @@ public class World {
 	}
 	
 	public Entity getEntityAt(int x, int y) {
-		return creatures.stream()
-				.filter(entity -> entity.getX() == x && entity.getY() == y)
+		Entity entity = creatures.stream()
+				.filter(creature -> creature.getX() == x && creature.getY() == y)
 				.findFirst()
 				.orElse(null);
+
+		if( entity == null )
+		{
+				entity = items.stream()
+				.filter(item -> item.getX() == x && item.getY() == y)
+				.findFirst()
+				.orElse(null);
+		}
+		return( entity );
 	}
 	
 	public boolean isBlocked(int x, int y) {
@@ -69,8 +106,8 @@ public class World {
 	
 	public void update() {
 		creatures.stream()
-		.filter(creature -> creature.getType() != "player")
-		.forEach(creature -> creature.update(this));
+		.filter(creature -> creature.getType() != Constants.PLAYER)
+		.forEach(creature -> creature.update());
 	}
 	
 	public Set<String> getTileTypesInArea(Rectangle rectangle) {
@@ -101,5 +138,25 @@ public class World {
 		}
 		
 		return creatureTypes;
+	}
+
+	public Set<String> getItemTypesInArea(Rectangle rectangle) {
+		Set<String> itemTypes = new HashSet<String>();
+		Tile tile;
+		
+		for (Item item : this.items) {
+			if (item.getX() > rectangle.getX() && item.getX() < rectangle.getMaxX() &&
+			item.getY() > rectangle.getY() && item.getY() < rectangle.getMaxY()) {
+				itemTypes.add(item.getType());
+			}
+		}
+		return itemTypes;
+	}
+
+		
+	public Item getItem() {
+		items.stream()
+		.filter(item -> item.getType()Constants.PLAYER)
+		.forEach(creature -> creature.update());
 	}
 }

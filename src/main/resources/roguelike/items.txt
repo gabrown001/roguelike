@@ -1,2 +1,9 @@
-id, name, glyph, color, effect
-0, meat, ~, red, health
+id, name, glyph, color, benefit, count, type, effect
+0, meat, ~, red, health, 10, food, none
+1, sword +2, !, red, attack, 2, weapon, none
+2, shield +2, +, red, defense, 2, shield, none
+3, sword +1, !, yellow, attack, 1, weapon, none
+4, holysword, !, red, attack, 2, weapon, holy:+1
+5, armour, T, yellow, defense, 5, armour, none
+6, claws, k, white, attack, 3, weapon, slash:+1
+7, bow, ), green, attack, 0, weapon, range:5

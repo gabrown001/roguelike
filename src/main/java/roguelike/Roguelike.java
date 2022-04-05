@@ -50,9 +50,9 @@ public class Roguelike {
 		
 		ui = new Interface(screenWidth, screenHeight, new Rectangle(mapWidth, mapHeight));
 
-		creatureData = loadData(Paths.get("roguelike", "creatures.txt").toString());
-		tileData = loadData(Paths.get("roguelike", "tiles.txt").toString());
-		itemData = loadData(Paths.get("roguelike",  "items.txt").toString());
+		creatureData = loadData(Paths.get(Constants.ROGUELIKE, Constants.CREATURES_FILE).toString());
+		tileData = loadData(Paths.get(Constants.ROGUELIKE, Constants.TILES_FILE).toString());
+		itemData = loadData(Paths.get(Constants.ROGUELIKE,  Constants.ITEMS_FILE).toString());
 		
 		createWorld();
 	}
@@ -60,51 +60,47 @@ public class Roguelike {
 	public Map<String, Map<String, String>> loadData(String fileName) {
 
 		InputStream inputStream = Roguelike.class.getClassLoader().getResourceAsStream(fileName);
-		if( inputStream == null )
-		{
-			throw (new IllegalArgumentException("Not able to location file - " + fileName));
-		}
-		else
-		{
-			Reader targetReader = new InputStreamReader(inputStream);
-			Map<String, Map<String, String>> entityMap = new HashMap<>();
-			String line = "";
-			String[] attributeNames = new String[10];
-			
-			try (BufferedReader br = new BufferedReader(targetReader)) {
 
-				line = br.readLine();
-				
-				if (line != null) {
-					attributeNames = line.split(", ");
-				}
-				
-				while ((line = br.readLine()) != null) {
-					String[] data = line.split(", ");
-					Map<String, String> entityData = new HashMap<>();
-					
-					for (int i=0; i<attributeNames.length; i++) {
-						entityData.put(attributeNames[i], data[i]);
-					}
-					
-					String name = data[1];
-					entityMap.put(name, entityData);
-				}
-				
-			} catch (IOException e) {
-				e.printStackTrace();
+		Reader targetReader = new InputStreamReader(inputStream);
+		Map<String, Map<String, String>> entityMap = new HashMap<>();
+		String line = "";
+		String[] attributeNames = new String[10];
+		
+		try (BufferedReader br = new BufferedReader(targetReader)) {
+
+			line = br.readLine();
+			
+			if (line != null) {
+				attributeNames = line.split(", ");
 			}
-			return entityMap;
+			
+			while ((line = br.readLine()) != null) {
+				String[] data = line.split(", ");
+				Map<String, String> entityData = new HashMap<>();
+				
+				for (int i=0; i<attributeNames.length; i++) {
+					entityData.put(attributeNames[i], data[i]);
+				}
+				
+				String name = data[1];
+				entityMap.put(name, entityData);
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return entityMap;
+
 	}
 	
 	private void createWorld(){
-		player = new Creature(creatureData.get("player"), 10, 10);
-		world = new WorldBuilder(tileData, creatureData, mapWidth, mapHeight)
-				    .fill("wall")
+		world = new WorldBuilder(tileData, creatureData, itemData, mapWidth, mapHeight)
+				    .fill(Constants.WALL_TYPE)
 				    .createRandomWalkCave(12232, 10, 10, 6000)
 				    .populateWorld(10)
+					.addItems(10)
 					.build();
+		player = new Creature(world, creatureData.get(Constants.PLAYER), 10, 10);
 		world.player = player;
 		world.addEntity(player);
 	}
@@ -115,15 +111,15 @@ public class Roguelike {
 	    	KeyEvent keypress = (KeyEvent)event;
 	    	switch (keypress.getKeyCode()){
 				case KeyEvent.VK_LEFT: 
-					player.move(world, -1, 0); 
+					player.move(-1, 0); 
 					break;
 				case KeyEvent.VK_RIGHT: 
-					player.move(world, 1, 0); break;
+					player.move(1, 0); break;
 				case KeyEvent.VK_UP: 
-					player.move(world, 0, -1); 
+					player.move(0, -1); 
 					break;
 				case KeyEvent.VK_DOWN: 
-					player.move(world, 0, 1); 
+					player.move(0, 1); 
 					break;
 			}
 	    } else if (event instanceof MouseEvent) {
@@ -133,7 +129,7 @@ public class Roguelike {
 	
 	public void render(){
 		ui.pointCameraAt(world, player.getX(), player.getY());
-		ui.drawDynamicLegend(gameViewArea, world, tileData, creatureData);
+		ui.drawDynamicLegend(gameViewArea, world, tileData, creatureData, itemData);
 		ui.refresh();
 	}
 	

@@ -2,6 +2,7 @@ package roguelike.graphics;
 
 import asciiPanel.AsciiPanel;
 import roguelike.entities.Creature;
+import roguelike.entities.Item;
 import roguelike.entities.Tile;
 import roguelike.world.World;
 
@@ -68,6 +69,16 @@ public class AsciiCamera {
 		int spx;
 		int spy;
         for(Creature entity : world.creatures)
+        {
+        	spx = entity.getX() - origin.x;
+        	spy = entity.getY() - origin.y;
+        	
+        	if ((spx >= 0 && spx < screenWidth) && (spy >= 0 && spy < screenHeight)) {
+        		terminal.write(entity.getGlyph(), spx, spy, entity.getColor(), world.tile(entity.getX(), entity.getY()).getBackgroundColor());
+        	}
+        }
+        
+        for(Item entity : world.items)
         {
         	spx = entity.getX() - origin.x;
         	spy = entity.getY() - origin.y;

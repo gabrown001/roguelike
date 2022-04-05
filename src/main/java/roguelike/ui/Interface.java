@@ -43,9 +43,9 @@ public class Interface extends JFrame implements KeyListener, MouseListener {
         super.repaint();
     }
     
-    public AsciiPanel getTerminal() {
-    	return terminal;
-    }
+    // public AsciiPanel getTerminal() {
+    // 	return terminal;
+    // }
     
     public InputEvent getNextInput() {
     	return inputQueue.poll();
@@ -64,7 +64,7 @@ public class Interface extends JFrame implements KeyListener, MouseListener {
 		inputQueue.add(e);
 	}
 
-	public void drawDynamicLegend(Rectangle gameViewArea, World world, Map<String, Map<String, String>> tileData, Map<String, Map<String, String>> creatureData) {
+	public void drawDynamicLegend(Rectangle gameViewArea, World world, Map<String, Map<String, String>> tileData, Map<String, Map<String, String>> creatureData, Map<String, Map<String, String>> itemData) {
 		int x = 5;
 		int y = gameViewArea.height;
 		char glyph;
@@ -83,6 +83,17 @@ public class Interface extends JFrame implements KeyListener, MouseListener {
 		for (String creatureType : world.getCreatureTypesInArea(gameViewArea)) {
 			glyph = creatureData.get(creatureType).get("glyph").charAt(0);
 			terminal.write(glyph + "   " + creatureType, x, y);
+			y += 1;
+			
+			if (y == gameViewArea.height+5) {
+				x += 15;
+				y = gameViewArea.height;
+			}
+		}
+
+		for (String itemType : world.getItemTypesInArea(gameViewArea)) {
+			glyph = itemData.get(itemType).get("glyph").charAt(0);
+			terminal.write(glyph + "   " + itemType, x, y);
 			y += 1;
 			
 			if (y == gameViewArea.height+5) {
