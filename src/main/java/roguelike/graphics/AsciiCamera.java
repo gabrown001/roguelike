@@ -68,7 +68,7 @@ public class AsciiCamera {
         
 		int spx;
 		int spy;
-        for(Creature entity : world.creatures)
+        for(Creature entity : world.getCreatures())
         {
         	spx = entity.getX() - origin.x;
         	spy = entity.getY() - origin.y;
@@ -78,7 +78,7 @@ public class AsciiCamera {
         	}
         }
         
-        for(Item entity : world.items)
+        for(Item entity : world.getItems())
         {
         	spx = entity.getX() - origin.x;
         	spy = entity.getY() - origin.y;

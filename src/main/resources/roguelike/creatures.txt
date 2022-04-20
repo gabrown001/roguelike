@@ -1,7 +1,8 @@
-id, name, glyph, color, type, behaviour, hitpoints, attack, defense
-0, player, @, green, player,none, 100, 5, 5
-1, zombie, z, white, undead,aggressive, 15, 2, 4
-2, sheep, s, white, animal,docile, 2, 0, 0
-3, ghost, g, grey, spectre,aggressive, 25, 2, 10
-4, bear, b, white, animal,docile, 40, 6, 6
-5, orc, o, green, humanoid,aggressive, 30, 5, 4
+id, name, glyph, color, type, behaviour, hitpoints, attack, defense, move
+0, player, @, orange, player, none, 100, 5, 5, 1
+1, zombie, z, green, undead, aggressive, 15, 2, 4, 1
+2, sheep, s, green, animal, docile, 2, 0, 0, 1
+3, ghost, g, green, spectre, aggressive, 25, 2, 10, 2
+4, bear, b, green, animal, docile, 40, 6, 6, 1
+5, orc, o, green, humanoid, aggressive, 30, 5, 4, 1
+6, fungus, f, green, plant, docile, 2, 0, 5, 0

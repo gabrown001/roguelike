@@ -1,5 +1,5 @@
 id, name, glyph, glyphColor, backgroundColor, blocked, type
-0, ground, ., white, black, false, open
+0, ground, ., white, black, false, ground
 1, wall, #, white, black, true, wall
 2, stair-up, /, white, black, false, passage
 3, stair-down, \, white, black, false, passage

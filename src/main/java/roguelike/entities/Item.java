@@ -23,24 +23,6 @@ public class Item extends Entity {
 		return (this._count);
 	}
 
-	public void use( Creature creature )
-	{
-		this.remove();
-    	if ("health".equals(this._benefit) && creature.getHitpoints() <= 90) {
-    		creature.increaseHitpoints(this._count);
-    	}
-		else if ("attack".equals(this._benefit)) {
-    		creature.increaseAttack(this._count);
-    	}
-		else if ("defense".equals(this._benefit)) {
-    		creature.increaseDefense(this._count);
-    	}
-		else {
-			System.out.println( "Unknown effect: " + this._count);
-		}
-
-	}
-
 	public String toString()
 	{
 		return(super.toString() + " benefit: " + this._benefit + " count: " + this._count);

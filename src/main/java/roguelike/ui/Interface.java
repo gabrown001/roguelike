@@ -1,6 +1,9 @@
 package roguelike.ui;
 
 import asciiPanel.AsciiPanel;
+import roguelike.entities.Creature;
+import roguelike.entities.Item;
+import roguelike.entities.Tile;
 import roguelike.graphics.AsciiCamera;
 import roguelike.world.World;
 
@@ -21,6 +24,9 @@ public class Interface extends JFrame implements KeyListener, MouseListener {
 	
 	private int screenWidth;
 	private int screenHeight;
+
+	// temp to 
+	Rectangle _gameViewArea;
 
 	
     public Interface(int screenWidth, int screenHeight, Rectangle mapDimensions) {
@@ -64,43 +70,59 @@ public class Interface extends JFrame implements KeyListener, MouseListener {
 		inputQueue.add(e);
 	}
 
-	public void drawDynamicLegend(Rectangle gameViewArea, World world, Map<String, Map<String, String>> tileData, Map<String, Map<String, String>> creatureData, Map<String, Map<String, String>> itemData) {
+	public void displayMessage( String message )
+	{
+		int x = 5;
+		int y = this._gameViewArea.height;
+		//System.out.println(this._gameViewArea);
+
+		//terminal.write(message, x, y);
+		terminal.write("test");
+	}
+
+	public void drawDynamicLegend(Rectangle gameViewArea, World world) {
 		int x = 5;
 		int y = gameViewArea.height;
-		char glyph;
-		
-		for (String tileType : world.getTileTypesInArea(gameViewArea)) {
-			glyph = tileData.get(tileType).get("glyph").charAt(0);
-			terminal.write(glyph + "   " + tileType, x, y);
-			y += 1;
-			
-			if (y == gameViewArea.height+2) {
-				x += 15;
-				y = gameViewArea.height;
-			}
-		}
-		
-		for (String creatureType : world.getCreatureTypesInArea(gameViewArea)) {
-			glyph = creatureData.get(creatureType).get("glyph").charAt(0);
-			terminal.write(glyph + "   " + creatureType, x, y);
-			y += 1;
-			
-			if (y == gameViewArea.height+5) {
-				x += 15;
-				y = gameViewArea.height;
-			}
-		}
 
-		for (String itemType : world.getItemTypesInArea(gameViewArea)) {
-			glyph = itemData.get(itemType).get("glyph").charAt(0);
-			terminal.write(glyph + "   " + itemType, x, y);
-			y += 1;
+		//System.out.println( "drawDynamicLegend: " + gameViewArea);
+
+		char glyph;
+
+		this._gameViewArea = gameViewArea;
+		
+		// for (Tile tile : world.getTileInArea(gameViewArea)) {
+		// 	glyph = tile.getGlyph();
+		// 	terminal.write(glyph + " " + tile.getName(), x, y);
+		// 	y += 1;
 			
-			if (y == gameViewArea.height+5) {
-				x += 15;
-				y = gameViewArea.height;
-			}
-		}
+		// 	if (y == gameViewArea.height+2) {
+		// 		x += 15;
+		// 		y = gameViewArea.height;
+		// 	}
+		// }
+		
+		// for (Creature creature : world.getCreaturesInArea(gameViewArea)) {
+		// 	glyph = creature.getGlyph();
+		// 	terminal.write(glyph + "   " + creature.getName(), x, y);
+		// 	y += 1;
+			
+		// 	if (y == gameViewArea.height+5) {
+		// 		x += 15;
+		// 		y = gameViewArea.height;
+		// 	}
+		// }
+
+		// for (Item item : world.getItemsInArea(gameViewArea)) {
+		// 	glyph = item.getGlyph();
+		// 	System.out.println("printing: " + glyph + " " + item.getName());
+		// 	//terminal.write(glyph + "   " + item.getName(), x, y);
+		// 	y += 1;
+			
+		// 	if (y == gameViewArea.height+5) {
+		// 		x += 15;
+		// 		y = gameViewArea.height;
+		// 	}
+		// }
 	}
 	
 	@Override

@@ -28,9 +28,9 @@ public class Roguelike {
 	private World world;
 	private Creature player;
 	
-	private Map<String,Map<String, String>> creatureData;
-	private Map<String,Map<String, String>> tileData;
-	private Map<String,Map<String, String>> itemData;
+	private Map<Integer,Map<String, String>> creatureData;
+	private Map<Integer,Map<String, String>> tileData;
+	private Map<Integer,Map<String, String>> itemData;
 	
 	private int screenWidth;
 	private int screenHeight;
@@ -57,12 +57,12 @@ public class Roguelike {
 		createWorld();
 	}
 	
-	public Map<String, Map<String, String>> loadData(String fileName) {
+	public Map<Integer, Map<String, String>> loadData(String fileName) {
 
 		InputStream inputStream = Roguelike.class.getClassLoader().getResourceAsStream(fileName);
 
 		Reader targetReader = new InputStreamReader(inputStream);
-		Map<String, Map<String, String>> entityMap = new HashMap<>();
+		Map<Integer, Map<String, String>> entityMap = new HashMap<>();
 		String line = "";
 		String[] attributeNames = new String[10];
 		
@@ -82,8 +82,8 @@ public class Roguelike {
 					entityData.put(attributeNames[i], data[i]);
 				}
 				
-				String name = data[1];
-				entityMap.put(name, entityData);
+				int id = Integer.parseInt(data[0]);
+				entityMap.put(id, entityData);
 			}
 			
 		} catch (IOException e) {
@@ -95,14 +95,15 @@ public class Roguelike {
 	
 	private void createWorld(){
 		world = new WorldBuilder(tileData, creatureData, itemData, mapWidth, mapHeight)
-				    .fill(Constants.WALL_TYPE)
-				    .createRandomWalkCave(12232, 10, 10, 6000)
-				    .populateWorld(10)
-					.addItems(10)
+				    .fill(Constants.WALL_ID)
+				    .createRandomWalkCave(12232, 10, 10, 10000)
+				    .populateWorld(20)
+					.createRandomItems(20)
 					.build();
-		player = new Creature(world, creatureData.get(Constants.PLAYER), 10, 10);
+		player = new Creature(world, creatureData.get(Constants.PLAYER_ID), 10, 10, null);
 		world.player = player;
 		world.addEntity(player);
+		world.setUI(ui);
 	}
 	
 	public void processInput() {
@@ -129,7 +130,7 @@ public class Roguelike {
 	
 	public void render(){
 		ui.pointCameraAt(world, player.getX(), player.getY());
-		ui.drawDynamicLegend(gameViewArea, world, tileData, creatureData, itemData);
+		ui.drawDynamicLegend(gameViewArea, world);
 		ui.refresh();
 	}
 	

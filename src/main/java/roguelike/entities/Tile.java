@@ -16,7 +16,9 @@ public class Tile extends Entity {
     public Tile(Map<String, String> tileData, int xpos, int ypos)
     {
     	super(null, tileData, xpos, ypos);
+
         backgroundColor = Roguelike.stringToColor(tileData.get("backgroundColor"));
         blocked = Boolean.valueOf(tileData.get("blocked"));
     }
+
 }
